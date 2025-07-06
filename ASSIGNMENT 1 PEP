@@ -1,0 +1,76 @@
+TASK 1 - VIRTUAL ENVIRONMENT SET UP
+TASK 2 - SYSTEM COMMAND MASTERY
+#!/bin/bash
+
+echo "Top 5 memory-consuming processes:"
+ps aux --sort=-%mem | head -n 6
+
+echo "Open ports:"
+ss -tuln
+
+echo "File count in /etc and /home:"
+find /etc -type f -name "*.conf" | wc -l
+find /home -type f -name "*.sh" | wc -l
+
+echo "Creating log backup..."
+tar -czf ~/logs_backup.tar.gz /var/log
+TASK 3- LINUX INTERNALS WITH PYTHON
+import os
+import shutil
+
+# CPU Info
+with open("/proc/cpuinfo") as f:
+    for line in f:
+        if "model name" in line:
+            print("CPU Model:", line.strip())
+            break
+
+# Bash Users
+with open("/etc/passwd") as f:
+    users = [line.split(":")[0] for line in f if "/bin/bash" in line]
+print("Users with bash shell:", users)
+
+# Create folder
+target_folder = "/home/bhuvana/LinuxExp/Week1/Day1"
+os.makedirs(target_folder, exist_ok=True)
+
+# Move .sh files from Desktop to target folder
+moved = False
+desktop_path = "/home/bhuvana/Desktop"
+for file in os.listdir(desktop_path):
+    if file.endswith(".sh"):
+        shutil.move(os.path.join(desktop_path, file), os.path.join(target_folder, file))
+        moved = True
+
+if moved:
+    print(f"Shell scripts moved to {target_folder}")
+else:
+    print("No .sh files found to move.")
+TASK 4 - DISK USAGE VIRTUALIZATION
+import os
+import matplotlib.pyplot as plt
+
+labels = []
+sizes = []
+
+home_path = "/home/bhuvana"  # Change if your username or path is different
+
+for item in os.listdir(home_path):
+    path = os.path.join(home_path, item)
+    if os.path.isdir(path):
+        size = os.popen(f'du -sh "{path}"').read().split()[0]
+        if size.endswith('M'):
+            size_val = float(size.replace('M', ''))
+        elif size.endswith('G'):
+            size_val = float(size.replace('G', '')) * 1024
+        elif size.endswith('K'):
+            size_val = float(size.replace('K', '')) / 1024
+        else:
+            size_val = 0
+        labels.append(item)
+        sizes.append(size_val)
+
+plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+plt.title("Disk Usage in /home/bhuvana")
+plt.savefig("disk_usage.png")  # This saves the image
+plt.show()  # This tries to open the chart (only works if GUI available)
